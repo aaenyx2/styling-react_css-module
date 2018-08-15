@@ -1,0 +1,68 @@
+css 스타일링
+
+준비-
+
+1. create-react-app 을 통하여 리액트 프로젝트를 생성
+2. yarn eject 명령어를 실행(node_modules/react-scripts 경로에 내장되어있는 리액트 프로젝트의 환경설정 파일들이 프로젝트 루트 경로로 이동)
+
+CSS 모듈로 스타일링하기-
+
+1. 웹팩 설정으로 가서 CSS Module 을 활성화(config/webpack.config.dev.js 를 열어서 css-loader 확인)  : 우리가 개발 할 때 사용하는 웹팩 개발 서버 전용 설정
+2. CSS 를 불러오기 위해 총 3가지의 로더가 사용.
+  - style-loader 가 스타일들을 불러와서 페이지에서 활성화
+  - css-loader 는 css 파일에서 import 와 url(...) 문들을 webpack 의 require 기능을 통하여 처리
+  - postcss-loader 의 경우에는, 우리가 입력한 CSS 구문이 모든 브라우저에서 제대로 작동할 수 있도록 자동으로 -webkit, -mos, -ms 등의 접두사를 처리
+
+3. css-loader 의 options에서 CSS Module 을 사용 하도록 설정
+
+        modules: true, //  CSS Module 을 활성화 하는 속성
+        localIdentName: '[path][name]__[local]--[hash:base64:5]' // CSS Module 에서 고유적으로 생성되는 클래스네임의 형식을 정해줌
+
+4. config/webpack.config.prod.js 열어서 css-loader 설정 추가 : 나중에 리액트 프로젝트를 완성하고 배포하게 될 때 빌드하는 과정에서 사용되는 환경설정 파일      
+
+        modules: true,
+
+
+
+
+
+--- css 모듈 tip
+
+
+
+1. 해당 요소가 속한 class 가 여러 개일 땐? : 'classNames' 라이브러리를 사용
+  
+  : 만약 .box class와 .blue class가 있다고 치면,
+  js 파일에서 css 모듈을 적용시킬 땐
+  className={[styles.box, styles.blue].join(' ')}
+  와 같이 해주면 된다. 결국 styles.box도 styles.blue도 문자열에 불과하므로
+  공백을 사이에 두고 이어붙여준 문자열을 그대로 입력하면 됨
+
+
+  하지만 위 코드가 귀찮으므로 classnames library를 설정해서 사용하자.
+
+  'yarn add classnames'
+
+  이 라이브러리를 설치하고나서부터는
+
+  className={classNames(styles.box, styles.blue)} 과 같이 입력해주면 됨.
+
+  혹은 classNames의 bind 기능을 이용해보자.
+
+  import classNames from 'classnames/bind';
+  const cx = classNames.bind(styles); // cx(box) = styles.box 
+
+  상기 두 코드를 추가한 뒤
+
+  <div className={cx('box', 'blue')}> // className={ styles.box styles.blue }
+
+
+  classNames 를 이용하면, 객체형식으로 혹은 배열 형식으로도 ClassName을 전달할 수 있다.
+
+
+  <div className={cx('box', {  
+          blue: isBlue
+      })}>
+
+  이를 응용하면 isBlue 값을 state로 받아와서 user의 입력 값에 따라 isBLue 값을 변경시켜
+  css 를 적용할 수도 있는 것임.
